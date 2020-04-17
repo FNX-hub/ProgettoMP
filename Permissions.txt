@@ -1,0 +1,74 @@
+SOURCE https://developer.android.com/guide/topics/connectivity/bluetooth
+
+PERMISSIONS
+
+Require 2 permisions:
+
+>	BLUETOOTH: used to perform any Bluetooth comunication, such as requesting a connection, accepting a connection, and transferring data.
+>	ACCESS_FINE_LOCATION: needed this permission because a Bluetooth scan can be used to gather information about the location of the user. This
+	information may come from the user's own devices, as well as Bluetooth beacons in use at locations such as shops and transit facilities.
+
+For initialize device discovery or manipulate Bluetoot setting:
+>	BLUETOOTH_ADMIN: needed this permission solely for the ability to discover local Bluetooth devices.
+	The other abilities granted by this permission should not be used, unless the application is a "power manager" that modifies Bluetooth settings upon user 	request.
+
+From Android 8.0 (API LEVEL 26) can be usesed the CompanionDeviceManager to perform a scan of nearby companion devices on behalf of your app without requiring the location permission.
+
+Permition decalration in the manifest:
+
+<manifest ... >
+  <uses-permission android:name="android.permission.BLUETOOTH" />
+  <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+  <!-- If your app targets Android 9 or lower, you can declare
+       ACCESS_COARSE_LOCATION instead. -->
+  <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+  ...
+</manifest>
+
+
+===================================================
+https://developer.android.com/reference/android/Manifest.permission#BLUETOOTH
+
+BLUETOOTH
+
+Added in API level 1
+
+public static final String BLUETOOTH
+
+Allows applications to connect to paired bluetooth devices.
+
+Protection level: normal
+
+Constant Value: "android.permission.BLUETOOTH"
+
+===================================================
+https://developer.android.com/reference/android/Manifest.permission#BLUETOOTH_ADMIN
+
+BLUETOOTH_ADMIN
+Added in API level 1
+
+public static final String BLUETOOTH_ADMIN
+
+Allows applications to discover and pair bluetooth devices.
+
+Protection level: normal
+
+Constant Value: "android.permission.BLUETOOTH_ADMIN" 
+
+===================================================
+https://developer.android.com/reference/android/Manifest.permission#ACCESS_FINE_LOCATION
+
+ACCESS_FINE_LOCATION
+
+Added in API level 1
+
+public static final String ACCESS_FINE_LOCATION
+
+Allows an app to access precise location. Alternatively, you might want ACCESS_COARSE_LOCATION.
+
+Protection level: dangerous
+
+Constant Value: "android.permission.ACCESS_FINE_LOCATION"
+
+
