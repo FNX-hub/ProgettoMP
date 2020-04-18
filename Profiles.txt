@@ -1,0 +1,62 @@
+https://developer.android.com/guide/topics/connectivity/bluetooth#Profiles
+
+BLUETOOTH PROFILES
+
+A Bluetooth profile is a wireless interface specification for Bluetooth-based communication between devices:
+
+
+>	Headset profile: provides support for Bluetooth headsets to be used with mobile phones. Android provides the BluetoothHeadset class, which is a proxy for 		controlling the Bluetooth Headset Service. This includes both Bluetooth Headset and Hands-Free (v1.5) profiles. The BluetoothHeadset class includes support for 	AT commands. For more discussion of this topic, see Vendor-specific AT commands section
+	
+	BluetoothHeadset class (https://developer.android.com/reference/android/bluetooth/BluetoothHeadset)
+
+
+>	The Advanced Audio Distribution Profile (A2DP): defines how high quality audio can be streamed from one device to another over a Bluetooth connection. Android 		provides the BluetoothA2dp class, which is a proxy for controlling the Bluetooth A2DP Service.
+
+	BluetoothA2dp class (https://developer.android.com/reference/android/bluetooth/BluetoothA2dp)
+
+>	Health Device. Android 4.0 (API level 14) introduces support for the Bluetooth Health Device Profile (HDP). This lets you create applications that use 			Bluetooth to communicate with health devices that support Bluetooth, such as heart-rate monitors, blood meters, thermometers, scales, etc (see Healt.txt).
+
+BLUETOOTH PROFILES FOR DUMMIES
+
+
+1>	Get the default adapter, as described in Setting Up Bluetooth (see Setup.txt file).
+2>	Set up a BluetoothProfile.ServiceListener. This listener notifies BluetoothProfile clients when they have been connected to or disconnected from the service.
+3>	Use getProfileProxy() to establish a connection to the profile proxy object associated with the profile.
+4>	In onServiceConnected(), get a handle to the profile proxy object.
+5>	Once you have the profile proxy object, you can use it to monitor the state of the connection and perform other operations that are relevant to that profile.
+
+=====================================================================================================
+	In the example below, the profile proxy object is an instance of BluetoothHeadset.
+=====================================================================================================
+BluetoothHeadset bluetoothHeadset;
+
+// Get the default adapter
+BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+private BluetoothProfile.ServiceListener profileListener = new BluetoothProfile.ServiceListener() {
+    public void onServiceConnected(int profile, BluetoothProfile proxy) {
+        if (profile == BluetoothProfile.HEADSET) {
+            bluetoothHeadset = (BluetoothHeadset) proxy;
+        }
+    }
+    public void onServiceDisconnected(int profile) {
+        if (profile == BluetoothProfile.HEADSET) {
+            bluetoothHeadset = null;
+        }
+    }
+};
+
+// Establish connection to the proxy.
+bluetoothAdapter.getProfileProxy(context, profileListener, BluetoothProfile.HEADSET);
+
+// ... call functions on bluetoothHeadset
+
+// Close proxy connection after use.
+bluetoothAdapter.closeProfileProxy(bluetoothHeadset);
+=====================================================================================================
+
+VENDOR-SPECIFIC AT COMMANDS
+
+Starting in Android 3.0 (API level 11), applications can register to receive system broadcasts of predefined vendor-specific AT commands sent by headsets. Create a broadcast receiver for the ACTION_VENDOR_SPECIFIC_HEADSET_EVENT intent to handle vendor-specific AT commands for the headset. (see https://developer.android.com/reference/android/bluetooth/BluetoothHeadset#ACTION_VENDOR_SPECIFIC_HEADSET_EVENT)
+
+
