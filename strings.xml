@@ -1,0 +1,34 @@
+<resources>
+    <string name="app_name">BluetoothSample</string>
+
+    // - - - - - - - - - ACTIVITY_MAIN - - - - - - - - - - - - - - - - - -
+    <string name="title_content_description"> Title Main Page</string>
+    <string name="btn_scan_example"> Searching Example </string>
+    <string name="btn_send_example"> Sending Example </string>
+    <string name="btn_paired_devices"> Paired Devices </string>
+    <string name="btn_discover"> Make Me Discoverable</string>
+
+    // - - - - - - - - - ACTIVITY_SEARCH - - - - - - - - - - - - - - - - - -
+    <string name="SearchActivityName"> Search Page </string>
+    <string name="btn_start_research"> Search </string>
+    <string name="DiscoverableTimerDefaultText"> Only Paired devices can see you </string>
+    <string name="DiscoverableTimerText"> You will remain discoverable for %1$d seconds </string>
+    <string name="ToastTextNoBluetooth"> This device does not support bluetooth </string>
+
+    // - - - - - - - - - ACTIVITY_SHARE - - - - - - - - - - - - - - - - - -
+    <string name="ShareActivityName"> Share Page </string>
+
+
+    // - - - - - - - - - MISCELLANEOUS (usati in piu' di un'activity) - - - - - - - - - - - - - - -
+    <string name="btn_back"> Back </string>
+
+
+
+
+
+
+
+
+
+
+</resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/layout_main"
+        android:layout_width="345dp"
+        android:layout_height="652dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/imageView_mainTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:adjustViewBounds="true"
+            android:contentDescription="@string/title_content_description"
+            android:paddingTop="25dp"
+            app:srcCompat="@drawable/title_beta" />
+
+        <Button
+            android:id="@+id/btn_ScanDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/buttonBackgroundColor"
+            android:text="@string/btn_scan_example"
+            android:textColor="@color/buttonTextColor" />
+
+        <Button
+            android:id="@+id/btn_SendToDevice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/buttonBackgroundColor"
+            android:text="@string/btn_send_example"
+            android:textColor="@color/buttonTextColor" />
+
+        <Button
+            android:id="@+id/btn_PairedDevicesList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/buttonBackgroundColor"
+            android:text="@string/btn_paired_devices"
+            android:textColor="@color/buttonTextColor" />
+
+        <Button
+            android:id="@+id/btn_TEMP"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TEST TEMP" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
