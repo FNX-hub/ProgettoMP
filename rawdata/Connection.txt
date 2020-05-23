@@ -1,0 +1,283 @@
+CONNECT DEVICES
+
+In order to create a connection between two devices, you must implement both the server-side and client-side mechanisms because one device must open a server socket, and the other one must initiate the connection using the server device's MAC address. The server device and the client device each obtain the required BluetoothSocket in different ways. The server receives socket information when an incoming connection is accepted. The client provides socket information when it opens an RFCOMM channel to the server.
+
+The server and client are considered connected to each other when they each have a connected BluetoothSocket on the same RFCOMM channel. At this point, each device can obtain input and output streams, and data transfer can begin, which is discussed in the section about Manage a connection. This section describes how to initiate the connection between two devices.
+
+CONNECTION TECHNIQUES
+
+One implementation technique is to automatically prepare each device as a server so that each device has a server socket open and listening for connections. In this case, either device can initiate a connection with the other and become the client. Alternatively, one device can explicitly host the connection and open a server socket on demand, and the other device initiates the connection.
+
+Note: If the two devices have not been previously paired, then the Android framework automatically shows a pairing request notification or dialog to the user during the connection procedure, as shown in Figure 3. Therefore, when your application attempts to connect devices, it doesn't need to be concerned about whether or not the devices are paired. Your RFCOMM connection attempt gets blocked until the user has successfully paired the two devices, and the attempt fails if the user rejects pairing, or if the pairing process fails or times out.
+
+CONNECTION AS SERVER
+
+When you want to connect two devices, one must act as a server by holding an open BluetoothServerSocket. The purpose of the server socket is to listen for incoming connection requests and provide a connected BluetoothSocket after a request is accepted. When the BluetoothSocket is acquired from the BluetoothServerSocket, the BluetoothServerSocket can—and should—be discarded, unless you want the device to accept more connections.
+
+To set up a server socket and accept a connection, complete the following sequence of steps:
+
+1>	Get a BluetoothServerSocket by calling listenUsingRfcommWithServiceRecord()
+The string is an identifiable name of your service, which the system automatically writes to a new Service Discovery Protocol (SDP) database entry on the device. The name is arbitrary and can simply be your application name. The Universally Unique Identifier (UUID) is also included in the SDP entry and forms the basis for the connection agreement with the client device. That is, when the client attempts to connect with this device, it carries a UUID that uniquely identifies the service with which it wants to connect. These UUIDs must match in order for the connection to be accepted.
+
+A UUID is a standardized 128-bit format for a string ID used to uniquely identify information. The point of a UUID is that it's big enough that you can select any random ID and it doesn't clash with any other ID. In this case, it's used to uniquely identify your application's Bluetooth service. To get a UUID to use with your application, you can use one of the many random UUID generators on the web, then initialize a UUID with fromString(String).
+
+2>	Start listening for connection requests by calling accept().
+
+This is a blocking call. It returns when either a connection has been accepted or an exception has occurred. A connection is accepted only when a remote device has sent a connection request containing a UUID that matches the one registered with this listening server socket. When successful, accept() returns a connected BluetoothSocket.
+
+3>	Unless you want to accept additional connections, call close(). 
+
+This method call releases the server socket and all its resources, but doesn't close the connected BluetoothSocket that's been returned by accept(). Unlike TCP/IP, RFCOMM allows only one connected client per channel at a time, so in most cases, it makes sense to call close() on the BluetoothServerSocket immediately after accepting a connected socket
+
+Because the accept() call is a blocking call, it should not be executed in the main activity UI thread so that your application can still respond to other user interactions. It usually makes sense to do all work that involves a BluetoothServerSocket or BluetoothSocket in a new thread managed by your application. To abort a blocked call such as accept(), call close() on the BluetoothServerSocket or BluetoothSocket from another thread. Note that all methods on a BluetoothServerSocket or BluetoothSocket are thread-safe.
+
+==================================================================================
+private class AcceptThread extends Thread {
+    private final BluetoothServerSocket mmServerSocket;
+
+    public AcceptThread() {
+        // Use a temporary object that is later assigned to mmServerSocket
+        // because mmServerSocket is final.
+        BluetoothServerSocket tmp = null;
+        try {
+            // MY_UUID is the app's UUID string, also used by the client code.
+            tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+        } catch (IOException e) {
+            Log.e(TAG, "Socket's listen() method failed", e);
+        }
+        mmServerSocket = tmp;
+    }
+
+    public void run() {
+        BluetoothSocket socket = null;
+        // Keep listening until exception occurs or a socket is returned.
+        while (true) {
+            try {
+                socket = mmServerSocket.accept();
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's accept() method failed", e);
+                break;
+            }
+
+            if (socket != null) {
+                // A connection was accepted. Perform work associated with
+                // the connection in a separate thread.
+                manageMyConnectedSocket(socket);
+                mmServerSocket.close();
+                break;
+            }
+        }
+    }
+
+    // Closes the connect socket and causes the thread to finish.
+    public void cancel() {
+        try {
+            mmServerSocket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not close the connect socket", e);
+        }
+    }
+}
+==================================================================================
+
+In this example, only one incoming connection is desired, so as soon as a connection is accepted and the BluetoothSocket is acquired, the app passes the acquired BluetoothSocket to a separate thread, closes the BluetoothServerSocket, and breaks out of the loop.
+
+Note that when accept() returns the BluetoothSocket, the socket is already connected. Therefore, you shouldn't call connect(), as you do from the client side.
+
+The app-specific manageMyConnectedSocket() method is designed to initiate the thread for transferring data, which is discussed in the section about Manage a Connection.
+
+Usually, you should close your BluetoothServerSocket as soon as you are done listening for incoming connections. In this example, close() is called as soon as the BluetoothSocket is acquired. You may also want to provide a public method in your thread that can close the private BluetoothSocket in the event that you need to stop listening on that server socket.
+
+CONNECT AS CLIENT
+
+In order to initiate a connection with a remote device that is accepting connections on an open server socket, you must first obtain a BluetoothDevice object that represents the remote device. To learn how to create a BluetoothDevice, see Finding Devices. You must then use the BluetoothDevice to acquire a BluetoothSocket and initiate the connection.
+
+1>	Using the BluetoothDevice, get a BluetoothSocket by calling createRfcommSocketToServiceRecord(UUID).
+
+This method initializes a BluetoothSocket object that allows the client to connect to a BluetoothDevice. The UUID passed here must match the UUID used by the server device when it called listenUsingRfcommWithServiceRecord(String, UUID) to open its BluetoothServerSocket. To use a matching UUID, hard-code the UUID string into your application, and then reference it from both the server and client code.
+
+2>	Initiate the connection by calling connect(). Note that this method is a blocking call.
+
+After a client calls this method, the system performs an SDP lookup to find the remote device with the matching UUID. If the lookup is successful and the remote device accepts the connection, it shares the RFCOMM channel to use during the connection, and the connect() method returns. If the connection fails, or if the connect() method times out (after about 12 seconds), then the method throws an IOException.
+
+Because connect() is a blocking call, you should always perform this connection procedure in a thread that is separate from the main activity (UI) thread.
+
+Note: You should always call cancelDiscovery() to ensure that the device isn't performing device discovery before you call connect(). If discovery is in progress, then the connection attempt is significantly slowed, and it's more likely to fail.
+
+==================================================================================
+private class ConnectThread extends Thread {
+    private final BluetoothSocket mmSocket;
+    private final BluetoothDevice mmDevice;
+
+    public ConnectThread(BluetoothDevice device) {
+        // Use a temporary object that is later assigned to mmSocket
+        // because mmSocket is final.
+        BluetoothSocket tmp = null;
+        mmDevice = device;
+
+        try {
+            // Get a BluetoothSocket to connect with the given BluetoothDevice.
+            // MY_UUID is the app's UUID string, also used in the server code.
+            tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
+        } catch (IOException e) {
+            Log.e(TAG, "Socket's create() method failed", e);
+        }
+        mmSocket = tmp;
+    }
+
+    public void run() {
+        // Cancel discovery because it otherwise slows down the connection.
+        bluetoothAdapter.cancelDiscovery();
+
+        try {
+            // Connect to the remote device through the socket. This call blocks
+            // until it succeeds or throws an exception.
+            mmSocket.connect();
+        } catch (IOException connectException) {
+            // Unable to connect; close the socket and return.
+            try {
+                mmSocket.close();
+            } catch (IOException closeException) {
+                Log.e(TAG, "Could not close the client socket", closeException);
+            }
+            return;
+        }
+
+        // The connection attempt succeeded. Perform work associated with
+        // the connection in a separate thread.
+        manageMyConnectedSocket(mmSocket);
+    }
+
+    // Closes the client socket and causes the thread to finish.
+    public void cancel() {
+        try {
+            mmSocket.close();
+        } catch (IOException e) {
+            Log.e(TAG, "Could not close the client socket", e);
+        }
+    }
+}
+==================================================================================
+
+Notice that, in this snippet, cancelDiscovery() is called before the connection attempt occurs. You should always call cancelDiscovery() before connect(), especially because cancelDiscovery() succeeds regardless of whether device discovery is currently in progress. If your app needs to determine whether device discovery is in progress, however, you can check using isDiscovering().
+
+The app-specific manageMyConnectedSocket() method is designed to initiate the thread for transferring data, which is discussed in the section about Managing a Connection.
+
+When you're done with your BluetoothSocket, always call close(). Doing so immediately closes the connected socket and release all related internal resources.
+
+MANAGE CONNECTION
+
+After you have successfully connected multiple devices, each one has a connected BluetoothSocket. This is where the fun begins because you can share information between devices. Using the BluetoothSocket, the general procedure to transfer data is as follows:
+
+1>	Get the InputStream and OutputStream that handle transmissions through the socket using getInputStream() and getOutputStream(), respectively.
+
+2>	Read and write data to the streams using read(byte[]) and write(byte[]).
+
+There are, of course, implementation details to consider. In particular, you should use a dedicated thread for reading from the stream and writing to it. This is important because both the read(byte[]) and write(byte[]) methods are blocking calls. The read(byte[]) method blocks until there is something to read from the stream. The write(byte[]) method doesn't usually block, but it can block for flow control if the remote device isn't calling read(byte[]) quickly enough and the intermediate buffers become full as a result. So, your main loop in the thread should be dedicated to reading from the InputStream. A separate public method in the thread can be used to initiate writes to the OutputStream.
+
+==================================================================================
+public class MyBluetoothService {
+    private static final String TAG = "MY_APP_DEBUG_TAG";
+    private Handler handler; // handler that gets info from Bluetooth service
+
+    // Defines several constants used when transmitting messages between the
+    // service and the UI.
+    private interface MessageConstants {
+        public static final int MESSAGE_READ = 0;
+        public static final int MESSAGE_WRITE = 1;
+        public static final int MESSAGE_TOAST = 2;
+
+        // ... (Add other message types here as needed.)
+    }
+
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+        private byte[] mmBuffer; // mmBuffer store for the stream
+
+        public ConnectedThread(BluetoothSocket socket) {
+            mmSocket = socket;
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            // Get the input and output streams; using temp objects because
+            // member streams are final.
+            try {
+                tmpIn = socket.getInputStream();
+            } catch (IOException e) {
+                Log.e(TAG, "Error occurred when creating input stream", e);
+            }
+            try {
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) {
+                Log.e(TAG, "Error occurred when creating output stream", e);
+            }
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        public void run() {
+            mmBuffer = new byte[1024];
+            int numBytes; // bytes returned from read()
+
+            // Keep listening to the InputStream until an exception occurs.
+            while (true) {
+                try {
+                    // Read from the InputStream.
+                    numBytes = mmInStream.read(mmBuffer);
+                    // Send the obtained bytes to the UI activity.
+                    Message readMsg = handler.obtainMessage(
+                            MessageConstants.MESSAGE_READ, numBytes, -1,
+                            mmBuffer);
+                    readMsg.sendToTarget();
+                } catch (IOException e) {
+                    Log.d(TAG, "Input stream was disconnected", e);
+                    break;
+                }
+            }
+        }
+
+        // Call this from the main activity to send data to the remote device.
+        public void write(byte[] bytes) {
+            try {
+                mmOutStream.write(bytes);
+
+                // Share the sent message with the UI activity.
+                Message writtenMsg = handler.obtainMessage(
+                        MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
+                writtenMsg.sendToTarget();
+            } catch (IOException e) {
+                Log.e(TAG, "Error occurred when sending data", e);
+
+                // Send a failure message back to the activity.
+                Message writeErrorMsg =
+                        handler.obtainMessage(MessageConstants.MESSAGE_TOAST);
+                Bundle bundle = new Bundle();
+                bundle.putString("toast",
+                        "Couldn't send data to the other device");
+                writeErrorMsg.setData(bundle);
+                handler.sendMessage(writeErrorMsg);
+            }
+        }
+
+        // Call this method from the main activity to shut down the connection.
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Could not close the connect socket", e);
+            }
+        }
+    }
+}
+==================================================================================
+
+After the constructor acquires the necessary streams, the thread waits for data to come through the InputStream. When read(byte[]) returns with data from the stream, the data is sent to the main activity using a member Handler from the parent class. The thread then waits for more bytes to be read from the InputStream.
+
+Sending outgoing data is as simple as calling the thread's write() method from the main activity and passing in the bytes to be sent. This method calls write(byte[]) to send the data to the remote device. If an IOException is thrown when calling write(byte[]), the thread sends a toast to the main activity, explaining to the user that the device couldn't send the given bytes to the other (connected) device.
+
+The thread's cancel() method allows the connection to be terminated at any time by closing the BluetoothSocket. This method should always be called when you're done using the Bluetooth connection.
+
+For a demonstration of using the Bluetooth APIs, see the Bluetooth Chat sample app.

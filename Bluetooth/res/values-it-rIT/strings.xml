@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="available_devices">Dispositivi multimediali connessi</string>
+    <string name="pairing">Accoppia nuovo dispositivo</string>
+    <string name="history_devices">Dispositivi connessi in precedenza</string>
+    <string name="search_device">Dispositivi disponibili</string>
+    <string name="info">Attiva il Bluetooth per connetterti ad altri dispositivi</string>
+    <string name="history">File ricevuti</string>
+    <string name="no_previous_device">Nessun dispositivo precedente</string>
+    <string name="statusConnected" translatable="false">"Attivo - Connesso "</string>
+    <string name="statusActive">Attivo</string>
+</resources>
