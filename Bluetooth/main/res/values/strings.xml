@@ -14,4 +14,5 @@
     <string name="about" translatable="false">About Us</string>
     <string name="Null" translatable="false">Null</string>
     <string name="no_previous_device">No previous device</string>
+    <string name="visibile">Visibile</string>
 </resources>

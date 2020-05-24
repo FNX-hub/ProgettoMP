@@ -11,7 +11,8 @@
         <item name="android:textColorSecondary">@color/secondaryTextColor</item>
         <item name="android:textViewStyle">@style/Text</item>
         <item name="cardViewStyle">@style/MyCardView</item>
-
+        <item  name="tabSelectedTextColor">@color/primaryColor</item>
+        <item name="tabTextColor">@color/secondaryTextColor</item>
     </style>
 
     <style name="MyCardView" parent="CardView">
@@ -19,6 +20,7 @@
         <item name="android:textColor">@color/secondaryTextColor</item>
         <item name="android:switchTextOn">@color/primaryTextColor</item>
         <item name="android:switchTextOff">@color/secondaryTextColor</item>
+        <item name="cardCornerRadius">0dp</item>
     </style>
 
     <style name="Text" parent="Widget.AppCompat.TextView">
@@ -26,6 +28,4 @@
         <item name="android:textColorPrimary">@color/primaryTextColor</item>
         <item name="android:textColorSecondary">@color/secondaryTextColor</item>
     </style>
-
-
 </resources>
