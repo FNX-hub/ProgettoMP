@@ -1,5 +1,8 @@
 package com.fnxhub.bluetooth;
 
+//dichiarazione dell'oggetto device
+//so status ha getter/setter
+
 class Device {
 
     private String deviceName;
@@ -17,4 +20,5 @@ class Device {
     String getStatus() {
         return status;
     }
+    void setStatus(String status) { this.status = status; }
 }

@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 
 import java.util.List;
 
+//adapter che permette di creare liste di fragment generici
+
 public class FragmentAdapter extends FragmentPagerAdapter {
 
     private List<Fragment> fragments;

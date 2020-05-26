@@ -6,6 +6,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
+// funzione per aggiungere elementi alle RecycleView
+// richiede il contesto pre creare l'adapter
+
 public class RecycleViewInflater {
 
     private Context context;

@@ -58,16 +58,34 @@
                         android:id="@+id/swtBtVisible"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/visibile"
+                        android:enabled="false"
+                        android:text="@string/not_visible"
                         android:textSize="18sp"
                         android:textStyle="bold" />
 
-                    <TextView
-                        android:id="@+id/tvTimer"
+                    <LinearLayout
+                        android:id="@+id/llTimer"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Remaning Time: 00:00"
-                        android:textColor="@color/primaryLightColor" />
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvTimerStatic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/visibility_time_t"
+                            android:textColor="@color/primaryLightColor" />
+
+                        <TextView
+                            android:id="@+id/tvtimerDynamuc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="00:00"
+                            android:textColor="@color/primaryLightColor" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
@@ -94,7 +112,7 @@
                 app:layout_constraintTop_toBottomOf="@+id/divider">
 
                 <TextView
-                    android:id="@+id/tvDeviceName"
+                    android:id="@+id/tvAdd"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableStart="@drawable/ic_add"
@@ -130,7 +148,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/idScan"
+                        android:id="@+id/tvScan"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="59"
@@ -144,7 +162,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:indeterminate="false"
-                        android:visibility="visible" />
+                        android:visibility="invisible" />
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -176,12 +194,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider"
-                app:layout_constraintBottom_toTopOf="@+id/info"
+                app:layout_constraintBottom_toTopOf="@+id/cvInfo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <androidx.cardview.widget.CardView
-                android:id="@+id/info"
+                android:id="@+id/cvInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"

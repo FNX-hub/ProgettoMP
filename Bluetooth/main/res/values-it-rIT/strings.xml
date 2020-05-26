@@ -7,6 +7,11 @@
     <string name="info">Attiva il Bluetooth per connetterti ad altri dispositivi</string>
     <string name="history">File ricevuti</string>
     <string name="no_previous_device">Nessun dispositivo precedente</string>
-    <string name="statusConnected" translatable="false">"Attivo - Connesso "</string>
     <string name="statusActive">Attivo</string>
+    <string name="not_visible">Non Visibile</string>
+    <string name="visibility_time_t">"Tempo di visibilità   "</string>
+    <string name="option">Opzioni</string>
+    <string name="device">Dispositivi connessi</string>
+    <string name="statusConnected">Connesso</string>
+    <string name="statusConnecting">Connessione…</string>
 </resources>
